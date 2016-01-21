@@ -1,5 +1,21 @@
-// NAI_TEST.cpp : Defines the entry point for the console application.
-//
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+@flech
+Unwatch 1
+Star 0
+Fork 0 flech / NAI
+Code  Issues 0  Pull requests 0  Wiki  Pulse  Graphs  Settings
+Branch : master Find file Copy pathNAI / NAI_TEST.cpp
+		 84d91f4  an hour ago
+		 @flech flech Dodane wykrywanie koloru czerwonego
+		 1 contributor
+		 RawBlameHistory     58 lines(41 sloc)  1.01 KB
+		 // NAI_TEST.cpp : Defines the entry point for the console application.
+		 //
 
 #include "stdafx.h"
 #include "opencv2/core/core.hpp"
@@ -8,7 +24,7 @@
 #include <iostream>
 #include "opencv2/imgproc/imgproc.hpp"
 
-using namespace cv;
+		 using namespace cv;
 using namespace std;
 
 int main()
@@ -34,12 +50,14 @@ int main()
 			imshow("Screen", frame);
 
 			//cap >> frame; // get a new frame from camera
-			
+
 			cvtColor(frame, edges, COLOR_BGR2HSV);
-			
+
 			Mat filtr;
 
-			inRange(edges, Scalar(170, 150, 60), Scalar(179, 255, 255), filtr); 
+			//inRange(edges, Scalar(0, 180, 228), Scalar(11, 255, 255), filtr); // Dla czerwonej pokrywki
+			//inRange(edges, Scalar(90, 153, 228), Scalar(116, 225, 255), filtr); // Dla niebieskiego korka
+			//inRange(edges, Scalar(30, 28, 135), Scalar(86, 160, 255), filtr); // Dla zielonej zapalniczki
 
 
 			imshow("edges", edges);
