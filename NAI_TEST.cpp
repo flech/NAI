@@ -5,25 +5,53 @@
 #include "opencv2/core/core.hpp"
 #include <opencv2\\opencv.hpp>
 #include "opencv2/highgui/highgui.hpp"
-
+#include <iostream>
+#include "opencv2/imgproc/imgproc.hpp"
 
 using namespace cv;
+using namespace std;
+
 int main()
 {
 
 
-		VideoCapture cap(0);
+	VideoCapture cap(0);   // open default camer
+
+	if (!cap.isOpened()){
+		cout << "ERROR Camera is not working" << endl;
+		exit(0);
+	}
+	else
+	{
+		Mat edges;  // Przechowuje krawedzie
+		cout << "Video display - success. Press ESC to exit." << endl;
 		while (cap.isOpened())
 		{
-			std::cout << "HEHE";
-			Mat frame;
+			Mat frame;  // Standardowy input
 			if (!cap.read(frame))
 				break;
+
 			imshow("Screen", frame);
+
+			//cap >> frame; // get a new frame from camera
+			
+			cvtColor(frame, edges, COLOR_BGR2HSV);
+			
+			Mat filtr;
+
+			inRange(edges, Scalar(170, 150, 60), Scalar(179, 255, 255), filtr); 
+
+
+			imshow("edges", edges);
+			imshow("red", filtr);
 			int k = waitKey(10);
-			if (k == 27) {
+
+
+
+			if (k == 27) {   // ASCII 27 dla ESC
 				break;
 			}
 		}
-		return 0;
+	}
+	return 0;
 }
