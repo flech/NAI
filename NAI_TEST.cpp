@@ -1,5 +1,4 @@
 
-#include "stdafx.h"
 #include "opencv2/core/core.hpp"
 #include <opencv2\\opencv.hpp>
 #include "opencv2/highgui/highgui.hpp"
@@ -23,16 +22,20 @@ int main()
 	else
 	{
 		Mat frameHSV;  // Przechowuje obraz HSV
+		CascadeClassifier CClassif;
+		CClassif.load("cascade.xml");
 
-		//vector< vector<Point> > contours;   // Dwa vektory potrzebne dla outputu z findcontours
-		//vector<Vec4i> hierarchy;
+		if (CClassif.empty()) {
+			cout << "ERROR CASCADE NOT LOADED" << endl;
+			exit(0);
+		}
 
-
-		
-	
-		Mat trackedLines(480, 640, CV_8UC3, Scalar(0, 0, 0));  // Czarny mat dla linii
+		Mat track1;
 		Mat tracker(480, 640, CV_8UC3, Scalar(0, 0, 0));  // Czarny mat dla linii
+
+
 		cout << "Video display - success. Press ESC to exit." << endl;
+
 		while (cap.isOpened())
 		{
 
@@ -42,23 +45,26 @@ int main()
 			if (!cap.read(frame))
 				break;
 
+
+			vector<Rect> vectorK;                // Vector kwadrat
+
+
+
 			cvtColor(frame, frameHSV, COLOR_BGR2HSV);
 
 			Mat filtr;
 
 			//inRange(frameHSV, Scalar(0, 180, 158), Scalar(11, 255, 255), filtr); // Dla czerwonej pokrywki
-			inRange(frameHSV, Scalar(0, 180, 158), Scalar(200, 255, 255), filtr); // Dla czerwonej pokrywki w swietle
+			//inRange(frameHSV, Scalar(0, 180, 158), Scalar(200, 255, 255), filtr); // Dla czerwonej pokrywki w swietle
+			inRange(frameHSV, Scalar(18, 93, 121), Scalar(82, 184, 216), filtr); // Dla czerwonej pokrywki w swietle
 			//inRange(edges, Scalar(90, 153, 228), Scalar(116, 225, 255), filtr); // Dla niebieskiego korka
 			//inRange(edges, Scalar(30, 28, 135), Scalar(86, 160, 255), filtr); // Dla zielonej zapalniczki
-		
+
 			// DODAC ERODE I DILATE !_!
-			dilate(filtr, filtr, (-1, -1)); // -1-1 - centre obiektu 
-				erode(filtr, filtr,(-1,-1));
-			
-			// findContours(filtr, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); // fatal error 
-
-			//Moze 5sec nagrywania, ostatnia klatka filmu z filtrem czerwonym i przyrownanie do patternu ?! 
-
+			//dilate(filtr, filtr, Mat(), Point(-1, -1),3,1,1); // -1-1 - centre obiektu 
+			erode(filtr, filtr, Mat(), Point(-1, -1), 3, 1, 1);
+	
+			GaussianBlur(filtr, filtr, Size(5, 5), 0, 0);
 			Moments filtrMoments = moments(filtr);
 			double dM01 = filtrMoments.m01;
 			double dM10 = filtrMoments.m10;
@@ -69,22 +75,34 @@ int main()
 
 
 			if (X > -1 && Y > -1 && centerXY[0] > -1 && centerXY[1] > -1){   // zapobiega rysowaniu linii od gornego rogu -1-1
-				line(tracker, Point(centerXY[0], centerXY[1]), Point(X, Y), Scalar(255, 0, 0), 2);  // Scalar (BGR), rysuje od X do centerXY[0]...
+				line(tracker, Point(centerXY[0], centerXY[1]), Point(X, Y), Scalar(0, 0, 255), 10);  // Scalar (BGR), rysuje od X do centerXY[0]...
 			}
-			
+
+
 			X = centerXY[0];
 			Y = centerXY[1];
 
+
 			frame = frame + tracker;
 
+			//cvtColor(frame, frame, COLOR_BGR2GRAY);
+
+			//DETECTOR !
+			CClassif.detectMultiScale(frame, vectorK, 1.05, 3, CV_HAAR_SCALE_IMAGE, Size(200, 320));
+
+			for (int i = 0; i < (int)vectorK.size(); i++) {
+				Point pt1(vectorK[i].x, vectorK[i].y);
+				Point pt2(vectorK[i].x + vectorK[i].width,
+					vectorK[i].y + vectorK[i].width);
+				// Rysowanie
+				rectangle(frame, pt1, pt2, Scalar(0, 0, 255), 2);
+				}
+
 			imshow("Main", frame);
-			imshow("HSVview", frameHSV);
+			//imshow("HSVview", frameHSV);
 			imshow("FilteredRed", filtr);
 			imshow("Tracker", tracker);
-			imshow("TrackedLines", trackedLines);
-
-
-
+			//imshow("Grey", track1);
 
 
 			int k = waitKey(30);
@@ -94,6 +112,7 @@ int main()
 		}
 	}
 	cap.release();
+	destroyAllWindows();
 
 	return 0;
 }
