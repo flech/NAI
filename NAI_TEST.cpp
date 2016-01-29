@@ -56,14 +56,14 @@ int main()
 
 			//inRange(frameHSV, Scalar(0, 180, 158), Scalar(11, 255, 255), filtr); // Dla czerwonej pokrywki
 			//inRange(frameHSV, Scalar(0, 180, 158), Scalar(200, 255, 255), filtr); // Dla czerwonej pokrywki w swietle
-			inRange(frameHSV, Scalar(18, 93, 121), Scalar(82, 184, 216), filtr); // Dla czerwonej pokrywki w swietle
+			inRange(frameHSV, Scalar(16, 113, 61), Scalar(37, 256, 206), filtr); // Dla czerwonej pokrywki w swietle
 			//inRange(edges, Scalar(90, 153, 228), Scalar(116, 225, 255), filtr); // Dla niebieskiego korka
-			//inRange(edges, Scalar(30, 28, 135), Scalar(86, 160, 255), filtr); // Dla zielonej zapalniczki
+			//inRange(frameHSV, Scalar(30, 28, 135), Scalar(86, 160, 255), filtr); // Dla zielonej zapalniczki
 
 			// DODAC ERODE I DILATE !_!
 			//dilate(filtr, filtr, Mat(), Point(-1, -1),3,1,1); // -1-1 - centre obiektu 
 			erode(filtr, filtr, Mat(), Point(-1, -1), 3, 1, 1);
-	
+
 			GaussianBlur(filtr, filtr, Size(5, 5), 0, 0);
 			Moments filtrMoments = moments(filtr);
 			double dM01 = filtrMoments.m01;
@@ -88,15 +88,15 @@ int main()
 			//cvtColor(frame, frame, COLOR_BGR2GRAY);
 
 			//DETECTOR !
-			CClassif.detectMultiScale(frame, vectorK, 1.05, 3, CV_HAAR_SCALE_IMAGE, Size(200, 320));
+			CClassif.detectMultiScale(frame, vectorK, 1.1, 5, CV_HAAR_SCALE_IMAGE, Size(50, 360)); //CV_HAAR_DO_CANNY_PRUNING CV_HAAR_SCALE_IMAGE
 
 			for (int i = 0; i < (int)vectorK.size(); i++) {
 				Point pt1(vectorK[i].x, vectorK[i].y);
 				Point pt2(vectorK[i].x + vectorK[i].width,
 					vectorK[i].y + vectorK[i].width);
 				// Rysowanie
-				rectangle(frame, pt1, pt2, Scalar(0, 0, 255), 2);
-				}
+				rectangle(frame, pt1, pt2, Scalar(255, 0, 0), 2);
+			}
 
 			imshow("Main", frame);
 			//imshow("HSVview", frameHSV);
